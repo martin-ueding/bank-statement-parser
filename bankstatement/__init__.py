@@ -6,7 +6,7 @@
 import argparse
 import csv
 
-__docformat__ = "restructuredtext en"
+__docformat__ = 'restructuredtext en'
 
 def main():
     options = _parse_args()
@@ -19,19 +19,19 @@ def main():
 
 
 def _parse_args():
-    """
+    '''
     Parses the command line arguments.
 
     :return: Namespace with arguments.
     :rtype: Namespace
-    """
-    parser = argparse.ArgumentParser(description="")
-    parser.add_argument("statements", metavar="statement.csv", type=str, nargs="+", help="Bank statements in CSV CAMT format.")
-    parser.add_argument("--delimiter", default=';', help='CSV delimiter. Default %(default)s.')
-    #parser.add_argument("--version", action="version", version="<the version>")
+    '''
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('statements', metavar='statement.csv', type=str, nargs='+', help='Bank statements in CSV CAMT format.')
+    parser.add_argument('--delimiter', default=';', help='CSV delimiter. Default %(default)s.')
+    #parser.add_argument('--version', action='version', version='<the version>')
 
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
