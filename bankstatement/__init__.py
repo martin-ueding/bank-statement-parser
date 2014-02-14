@@ -27,6 +27,12 @@ class Expense(Base):
     text = sqlalchemy.Column(sqlalchemy.String)
     amount = sqlalchemy.Column(sqlalchemy.Float)
 
+    def __repr__(self):
+        return 'Expense({party}, {date}, {text}, {amount})'.format(
+            amount=self.amount, date=self.date, party=self.party,
+            text=self.text,
+        )
+
 
 class Store(Base):
     __tablename__ = 'stores'
