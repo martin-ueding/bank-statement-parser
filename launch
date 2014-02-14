@@ -4,4 +4,4 @@
 set -e
 set -u
 
-python3 -m bankstatement.__init__ '/home/mu/Downloads/20140209-1931773905-umsatz(1).csv'
+python3 -m bankstatement.__init__ '/home/mu/Downloads/20140209-1931773905-umsatz(1).csv' "$@"
