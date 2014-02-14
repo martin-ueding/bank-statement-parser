@@ -120,8 +120,6 @@ def main():
                 e['party'] = re.sub('\s+', ' ', beguenstigter).strip()
                 e['text'] = re.sub('\s+', ' ', verwendungszweck).strip()
 
-                #print(e)
-
                 result = session.query(Expense).filter(Expense.party == e['party']).filter(Expense.text == e['text']).scalar()
 
                 if result is None:
