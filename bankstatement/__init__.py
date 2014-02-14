@@ -89,7 +89,7 @@ def main():
             t.align = 'l'
             t.align['id'] = 'r'
             for store in stores:
-                t.add_row([store.id, store.name, store.category, store.regex])
+                t.add_row([store.id, store.name, store.category.name, store.regex])
             print(t)
         if options.what == 'expense':
             expenses = session.query(Expense)
