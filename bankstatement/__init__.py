@@ -78,18 +78,25 @@ def main():
         if options.what == 'category':
             categories = session.query(Category)
             t = prettytable.PrettyTable(['id', 'name'])
+            t.align = 'l'
+            t.align['id'] = 'r'
             for category in categories:
                 t.add_row([category.id, category.name])
             print(t)
         if options.what == 'store':
             stores = session.query(Store)
             t = prettytable.PrettyTable(['id', 'name', 'category', 'regex'])
+            t.align = 'l'
+            t.align['id'] = 'r'
             for store in stores:
                 t.add_row([store.id, store.name, store.category, store.regex])
             print(t)
         if options.what == 'expense':
             expenses = session.query(Expense)
             t = prettytable.PrettyTable(['id', 'amount', 'date', 'party', 'text'])
+            t.align = 'l'
+            t.align['id'] = 'r'
+            t.align['amount'] = 'r'
             for expense in expenses:
                 t.add_row([expense.id, expense.amount, expense.date, expense.party, expense.text])
             print(t)
