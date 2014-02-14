@@ -102,7 +102,7 @@ def main():
                 t.add_row([store.id, store.name, store.category.name, store.regex])
             print(t)
         if options.what == 'expense':
-            expenses = session.query(Expense)
+            expenses = session.query(Expense).filter(Expense.amount < 0)
             t = prettytable.PrettyTable(['ID', 'Amount', 'Date', 'Party', 'Text', 'Store', 'Category'])
             t.align = 'l'
             t.align['id'] = 'r'
