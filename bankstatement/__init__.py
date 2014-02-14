@@ -39,7 +39,7 @@ class Category(Base):
 def main():
     options = _parse_args()
 
-    engine = sqlalchemy.create_engine('sqlite:///test.sqlite', echo=True)
+    engine = sqlalchemy.create_engine('sqlite:///test.sqlite', echo=options.echo_sql)
     session = sqlalchemy.orm.sessionmaker(bind=engine)()
 
     Base.metadata.create_all(engine)
@@ -86,6 +86,7 @@ def _parse_args():
     parser.add_argument('what', type=str)
     parser.add_argument('extra', type=str, nargs='*')
     #parser.add_argument('--delimiter', default=';', help='CSV delimiter. Default %(default)s.')
+    parser.add_argument('--echo-sql', action='store_true')
     #parser.add_argument('--version', action='version', version='<the version>')
 
     return parser.parse_args()
