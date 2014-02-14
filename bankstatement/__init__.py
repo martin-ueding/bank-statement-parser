@@ -32,9 +32,9 @@ class Expense(Base):
     store = sqlalchemy.orm.relationship("Store", backref=sqlalchemy.orm.backref('expenses'))
 
     def __repr__(self):
-        return 'Expense({party}, {date}, {text}, {amount})'.format(
+        return 'Expense({party}, {date}, {text}, {amount}, {store})'.format(
             amount=self.amount, date=self.date, party=self.party,
-            text=self.text,
+            text=self.text, store=self.store,
         )
 
 
@@ -49,13 +49,16 @@ class Store(Base):
     def __repr__(self):
         return self.name
 
+    def compile_regex(self):
+        self.pattern = re.compile(self.regex)
+
 class Category(Base):
     __tablename__ = 'categories'
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     name = sqlalchemy.Column(sqlalchemy.String)
 
     def __repr__(self):
-        return 'Category({name}, id={id})'.format(name=self.name, id=self.id)
+        return self.name
 
 def main():
     options = _parse_args()
@@ -72,11 +75,9 @@ def main():
             session.commit()
         if options.what == 'store':
             name, category_name, regex = options.extra
-            results = session.query(Category).filter(Category.name == category_name)
-            if len(list(results)) == 0:
+            category = session.query(Category).filter(Category.name == category_name).scalar()
+            if category is None:
                 category = Category(name=category_name)
-            else:
-                category = next(results)
             new_store = Store(name=name, category=category, regex=regex)
             session.add(new_store)
             session.commit()
@@ -92,7 +93,7 @@ def main():
             print(t)
         if options.what == 'store':
             stores = session.query(Store)
-            t = prettytable.PrettyTable(['id', 'name', 'category', 'regex'])
+            t = prettytable.PrettyTable(['ID', 'Name', 'Category', 'Regex'])
             t.align = 'l'
             t.align['id'] = 'r'
             for store in stores:
@@ -100,13 +101,22 @@ def main():
             print(t)
         if options.what == 'expense':
             expenses = session.query(Expense)
-            t = prettytable.PrettyTable(['id', 'amount', 'date', 'party', 'text', 'Store'])
+            t = prettytable.PrettyTable(['ID', 'Amount', 'Date', 'Party', 'Text', 'Store', 'Category'])
             t.align = 'l'
             t.align['id'] = 'r'
             t.align['amount'] = 'r'
             for expense in expenses:
-                t.add_row([expense.id, expense.amount, expense.date, expense.party, expense.text, expense.store])
+                t.add_row([expense.id, expense.amount, expense.date,
+                           expense.party, expense.text[:20], expense.store,
+                           None if expense.store is None else expense.store.category])
             print(t)
+
+    elif options.action == 'delete':
+        if options.what == 'store':
+            id, = options.extra
+            store = session.query(Store).filter(Store.id == id).scalar()
+            session.delete(store)
+            session.commit()
 
     elif options.action == 'import':
         with open(options.what) as f:
@@ -137,10 +147,25 @@ def main():
                     print('Expense already in database.')
         session.commit()
 
+    sync_all(session)
+
 def sync_all(session):
     '''
+    Matches the given stores to all expenses that still have a ``None`` entry
+    as store.
     '''
-    pass
+    stores = session.query(Store)
+    expenses = session.query(Expense).filter(Expense.store == None)
+    for expense in expenses:
+        #print(expense)
+        for store in stores:
+            #print('Trying to match {} to {}.'.format(store, expense.party))
+            matcher = re.search(store.regex, expense.party)
+            if matcher:
+                #print('Match!')
+                expense.store = store
+
+    session.commit()
 
 def _parse_args():
     '''
