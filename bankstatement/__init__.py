@@ -151,8 +151,7 @@ def main():
 
 def sync_all(session):
     '''
-    Matches the given stores to all expenses that still have a ``None`` entry
-    as store.
+    Matches the given stores to all expenses.
     '''
     stores = session.query(Store)
     expenses = session.query(Expense).filter(Expense.store == None)
