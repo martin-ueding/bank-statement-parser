@@ -147,6 +147,30 @@ def main():
                     print('Expense already in database.')
         session.commit()
 
+    elif options.action == 'plot':
+        if options.what == 'stacked':
+            expenses = session.query(Expense).filter(Expense.amount < 0)
+            sums = {}
+            for expense in expenses:
+                print(expense)
+                if expense.store is None:
+                    continue
+                year = expense.date.year
+                month = expense.date.month
+                category = expense.store.category.name
+                amount = expense.amount
+
+                if not category in sums:
+                    sums[category] = {}
+                if not year in sums[category]:
+                    sums[category][year] = {}
+                if not month in sums[category][year]:
+                    sums[category][year][month] = 0.0
+
+                sums[category][year][month] -= amount
+
+            print(sums)
+
     sync_all(session)
 
 def sync_all(session):
