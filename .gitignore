@@ -1,4 +1,4 @@
-bankstatement/__pycache__/
-doc/_build/
+*.pyc
+__pycache__
+_build
 test.sqlite
-bankstatement/__init__.pyc
