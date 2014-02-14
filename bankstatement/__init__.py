@@ -137,6 +137,11 @@ def main():
                     print('Expense already in database.')
         session.commit()
 
+def sync_all(session):
+    '''
+    '''
+    pass
+
 def _parse_args():
     '''
     Parses the command line arguments.
