@@ -5,9 +5,11 @@
 
 import argparse
 import csv
+import dateutil.parser
 import matplotlib.pyplot as pl
 import numpy as np
 import prettytable
+import re
 import sqlalchemy
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm
@@ -19,6 +21,12 @@ Base = sqlalchemy.ext.declarative.declarative_base()
 class Expense(Base):
     __tablename__ = 'expenses'
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+
+    party = sqlalchemy.Column(sqlalchemy.String)
+    date = sqlalchemy.Column(sqlalchemy.Date)
+    text = sqlalchemy.Column(sqlalchemy.String)
+    amount = sqlalchemy.Column(sqlalchemy.Float)
+
 
 class Store(Base):
     __tablename__ = 'stores'
@@ -60,7 +68,7 @@ def main():
             session.add(new_store)
             session.commit()
 
-    if options.action == 'table':
+    elif options.action == 'table':
         if options.what == 'category':
             categories = session.query(Category)
             t = prettytable.PrettyTable(['id', 'name'])
@@ -73,6 +81,41 @@ def main():
             for store in stores:
                 t.add_row([store.id, store.name, store.category, store.regex])
             print(t)
+        if options.what == 'expense':
+            expenses = session.query(Expense)
+            t = prettytable.PrettyTable(['id', 'amount', 'date', 'party', 'text'])
+            for expense in expenses:
+                t.add_row([expense.id, expense.amount, expense.date, expense.party, expense.text])
+            print(t)
+
+    elif options.action == 'import':
+        with open(options.what) as f:
+            reader = csv.reader(f, delimiter=';')
+            next(reader)
+            for row in reader:
+                # Split up all the columns. Those are the German meanings. Only
+                # the ones that are really needed are taken.
+                auftragskonto, buchungstag, valutadatum, buchungstext, \
+                verwendungszweck, glaeubiger_id, mandatsreferenz, \
+                kundenreferenz, sammlerreferenz, lastschrift_ursprungsbetrag, \
+                auslagenersatz_ruecklastschrift, beguenstigter, iban, bic, \
+                betrag, waehrung, info = row
+
+                e = {}
+                e['amount'] = float(betrag.replace(',', '.'))
+                e['date'] = dateutil.parser.parse(buchungstag)
+                e['party'] = re.sub('\s+', ' ', beguenstigter).strip()
+                e['text'] = re.sub('\s+', ' ', verwendungszweck).strip()
+
+                #print(e)
+
+                result = session.query(Expense).filter(Expense.date == e['date']).filter(Expense.amount == e['amount']).filter(Expense.party == e['party']).filter(Expense.text == e['text']).scalar()
+
+                print(result)
+
+                new_expense = Expense(**e)
+                session.add(new_expense)
+        session.commit()
 
 def _parse_args():
     '''
