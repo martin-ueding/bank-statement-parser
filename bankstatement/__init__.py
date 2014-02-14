@@ -122,12 +122,14 @@ def main():
 
                 #print(e)
 
-                result = session.query(Expense).filter(Expense.date == e['date']).filter(Expense.amount == e['amount']).filter(Expense.party == e['party']).filter(Expense.text == e['text']).scalar()
+                result = session.query(Expense).filter(Expense.party == e['party']).filter(Expense.text == e['text']).scalar()
 
-                print(result)
-
-                new_expense = Expense(**e)
-                session.add(new_expense)
+                if result is None:
+                    new_expense = Expense(**e)
+                    session.add(new_expense)
+                    print('Added:', new_expense)
+                else:
+                    print('Expense already in database.')
         session.commit()
 
 def _parse_args():
