@@ -7,6 +7,8 @@ import argparse
 import csv
 import dateutil.parser
 import matplotlib.pyplot as pl
+import matplotlib.dates
+import datetime
 import numpy as np
 import prettytable
 import re
@@ -133,7 +135,7 @@ def main():
 
                 e = {}
                 e['amount'] = float(betrag.replace(',', '.'))
-                e['date'] = dateutil.parser.parse(buchungstag)
+                e['date'] = dateutil.parser.parse(buchungstag, dayfirst=True)
                 e['party'] = re.sub('\s+', ' ', beguenstigter).strip()
                 e['text'] = re.sub('\s+', ' ', verwendungszweck).strip()
 
@@ -147,12 +149,18 @@ def main():
                     print('Expense already in database.')
         session.commit()
 
+    elif options.action == 'truncate':
+        if options.what == 'expense':
+            expenses = session.query(Expense)
+            for expense in expenses:
+                session.delete(expense)
+            session.commit()
+
     elif options.action == 'plot':
         if options.what == 'stacked':
             expenses = session.query(Expense).filter(Expense.amount < 0)
             sums = {}
             for expense in expenses:
-                print(expense)
                 if expense.store is None:
                     continue
                 year = expense.date.year
@@ -160,16 +168,28 @@ def main():
                 category = expense.store.category.name
                 amount = expense.amount
 
+                date = matplotlib.dates.date2num(datetime.date(year, month, 1))
+
                 if not category in sums:
                     sums[category] = {}
-                if not year in sums[category]:
-                    sums[category][year] = {}
-                if not month in sums[category][year]:
-                    sums[category][year][month] = 0.0
+                if not date in sums[category]:
+                    sums[category][date] = 0.0
 
-                sums[category][year][month] -= amount
+                sums[category][date] -= amount
 
             print(sums)
+
+            for category, data in sorted(sums.items()):
+                print(category)
+                l = sorted(list(data.items()))
+                dates, amounts = zip(*l)
+                print(dates)
+                print(amounts)
+
+                pl.plot_date(dates, amounts, linestyle='-')
+
+            pl.show()
+            pl.clf()
 
     sync_all(session)
 
