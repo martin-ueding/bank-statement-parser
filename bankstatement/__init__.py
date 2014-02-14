@@ -27,6 +27,10 @@ class Expense(Base):
     text = sqlalchemy.Column(sqlalchemy.String)
     amount = sqlalchemy.Column(sqlalchemy.Float)
 
+
+    store_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('stores.id'))
+    store = sqlalchemy.orm.relationship("Store", backref=sqlalchemy.orm.backref('expenses'))
+
     def __repr__(self):
         return 'Expense({party}, {date}, {text}, {amount})'.format(
             amount=self.amount, date=self.date, party=self.party,
@@ -41,6 +45,9 @@ class Store(Base):
     regex = sqlalchemy.Column(sqlalchemy.String)
     category_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('categories.id'))
     category = sqlalchemy.orm.relationship("Category", backref=sqlalchemy.orm.backref('stores'))
+
+    def __repr__(self):
+        return self.name
 
 class Category(Base):
     __tablename__ = 'categories'
@@ -93,12 +100,12 @@ def main():
             print(t)
         if options.what == 'expense':
             expenses = session.query(Expense)
-            t = prettytable.PrettyTable(['id', 'amount', 'date', 'party', 'text'])
+            t = prettytable.PrettyTable(['id', 'amount', 'date', 'party', 'text', 'Store'])
             t.align = 'l'
             t.align['id'] = 'r'
             t.align['amount'] = 'r'
             for expense in expenses:
-                t.add_row([expense.id, expense.amount, expense.date, expense.party, expense.text])
+                t.add_row([expense.id, expense.amount, expense.date, expense.party, expense.text, expense.store])
             print(t)
 
     elif options.action == 'import':
