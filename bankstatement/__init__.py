@@ -24,6 +24,7 @@ class Store(Base):
     __tablename__ = 'stores'
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     name = sqlalchemy.Column(sqlalchemy.String)
+    regex = sqlalchemy.Column(sqlalchemy.String)
     category_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('categories.id'))
     category = sqlalchemy.orm.relationship("Category", backref=sqlalchemy.orm.backref('stores'))
 
@@ -32,24 +33,31 @@ class Category(Base):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     name = sqlalchemy.Column(sqlalchemy.String)
 
-    def __init__(self, name):
-        self.name = name
-
     def __repr__(self):
         return 'Category({name}, id={id})'.format(name=self.name, id=self.id)
 
 def main():
     options = _parse_args()
 
-    engine = sqlalchemy.create_engine('sqlite:///test.sqlite', echo=False)
+    engine = sqlalchemy.create_engine('sqlite:///test.sqlite', echo=True)
     session = sqlalchemy.orm.sessionmaker(bind=engine)()
 
     Base.metadata.create_all(engine)
 
     if options.action == 'add':
         if options.what == 'category':
-            new_category = Category(options.extra[0])
+            new_category = Category(name=options.extra[0])
             session.add(new_category)
+            session.commit()
+        if options.what == 'store':
+            name, category_name, regex = options.extra
+            results = session.query(Category).filter(Category.name == category_name)
+            if len(list(results)) == 0:
+                category = Category(name=category_name)
+            else:
+                category = next(results)
+            new_store = Store(name=name, category=category, regex=regex)
+            session.add(new_store)
             session.commit()
 
     if options.action == 'table':
@@ -58,6 +66,12 @@ def main():
             t = prettytable.PrettyTable(['id', 'name'])
             for category in categories:
                 t.add_row([category.id, category.name])
+            print(t)
+        if options.what == 'store':
+            stores = session.query(Store)
+            t = prettytable.PrettyTable(['id', 'name', 'category', 'regex'])
+            for store in stores:
+                t.add_row([store.id, store.name, store.category, store.regex])
             print(t)
 
 def _parse_args():
