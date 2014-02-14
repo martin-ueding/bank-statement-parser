@@ -157,9 +157,10 @@ def main():
             session.commit()
 
     elif options.action == 'plot':
-        if options.what == 'stacked':
+        if options.what == 'lines':
             expenses = session.query(Expense).filter(Expense.amount < 0)
             sums = {}
+            sums_date = {}
             for expense in expenses:
                 if expense.store is None:
                     continue
@@ -168,27 +169,32 @@ def main():
                 category = expense.store.category.name
                 amount = expense.amount
 
-                date = matplotlib.dates.date2num(datetime.date(year, month, 1))
+                date = (year - 2000) + (month-1)/12
 
                 if not category in sums:
                     sums[category] = {}
                 if not date in sums[category]:
                     sums[category][date] = 0.0
 
-                sums[category][date] -= amount
+                if not date in sums_date:
+                    sums_date[date] = 0.0
 
-            print(sums)
+                sums[category][date] -= amount
+                sums_date[date] -= amount
 
             for category, data in sorted(sums.items()):
-                print(category)
                 l = sorted(list(data.items()))
                 dates, amounts = zip(*l)
-                print(dates)
-                print(amounts)
 
-                pl.plot_date(dates, amounts, linestyle='-')
+                pl.plot(dates, amounts, label=category, marker='o')
 
-            pl.show()
+            l = sorted(list(sums_date.items()))
+            dates, amounts = zip(*l)
+            pl.plot(dates, amounts, label='Summe', linewidth=2, marker='o', color='black')
+
+            pl.legend(loc='best')
+            pl.grid(True)
+            pl.savefig('plot-lines.pdf')
             pl.clf()
 
     sync_all(session)
