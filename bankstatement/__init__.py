@@ -157,12 +157,9 @@ def sync_all(session):
     stores = session.query(Store)
     expenses = session.query(Expense).filter(Expense.store == None)
     for expense in expenses:
-        #print(expense)
         for store in stores:
-            #print('Trying to match {} to {}.'.format(store, expense.party))
             matcher = re.search(store.regex, expense.party)
             if matcher:
-                #print('Match!')
                 expense.store = store
 
     session.commit()
