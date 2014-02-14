@@ -195,7 +195,7 @@ def main():
             pl.legend(loc='best')
             pl.grid(True)
             pl.title('Monthly spendings grouped by category')
-            pl.xlabel('Year ($-2000)')
+            pl.xlabel('Year ($-2000$)')
             pl.ylabel('€')
             pl.savefig('plot-lines.pdf')
             pl.clf()
