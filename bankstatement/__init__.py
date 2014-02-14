@@ -190,10 +190,13 @@ def main():
 
             l = sorted(list(sums_date.items()))
             dates, amounts = zip(*l)
-            pl.plot(dates, amounts, label='Summe', linewidth=2, marker='o', color='black')
+            pl.plot(dates, amounts, label='Sum', linewidth=2, marker='o', color='black')
 
             pl.legend(loc='best')
             pl.grid(True)
+            pl.title('Monthly spendings grouped by category')
+            pl.xlabel('Year ($-2000)')
+            pl.ylabel('€')
             pl.savefig('plot-lines.pdf')
             pl.clf()
 
