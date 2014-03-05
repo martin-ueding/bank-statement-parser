@@ -6,13 +6,14 @@
 import argparse
 import csv
 import datetime
+import os.path
+import re
+
 import dateutil.parser
 import matplotlib.dates
 import matplotlib.pyplot as pl
 import numpy as np
-import os.path
 import prettytable
-import re
 import sqlalchemy
 import sqlalchemy.ext.declarative
 import sqlalchemy.orm

@@ -26,6 +26,12 @@ setup(
         ],
     },
     install_requires=[
+        'dateutil',
+        'matplotlib',
+        'numpy',
+        'prettytable',
+        'scipy',
+        'sqlalchemy',
     ],
     url = "https://github.com/martin-ueding/bank-statement-parser",
     download_url="http://martin-ueding.de/download/bank-statement-parser/",
