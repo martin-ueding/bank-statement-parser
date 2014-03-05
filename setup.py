@@ -26,7 +26,7 @@ setup(
         ],
     },
     install_requires=[
-        'dateutil',
+        #'dateutil',
         'matplotlib',
         'numpy',
         'prettytable',
