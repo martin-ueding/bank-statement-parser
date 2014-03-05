@@ -5,11 +5,12 @@
 
 import argparse
 import csv
-import dateutil.parser
-import matplotlib.pyplot as pl
-import matplotlib.dates
 import datetime
+import dateutil.parser
+import matplotlib.dates
+import matplotlib.pyplot as pl
 import numpy as np
+import os.path
 import prettytable
 import re
 import sqlalchemy
