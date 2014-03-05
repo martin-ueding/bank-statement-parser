@@ -2,3 +2,5 @@
 __pycache__
 _build
 test.sqlite
+bank_statement_parser.egg-info/
+build/
