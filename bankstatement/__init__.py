@@ -141,7 +141,7 @@ def main():
                 e['party'] = re.sub('\s+', ' ', beguenstigter).strip()
                 e['text'] = re.sub('\s+', ' ', verwendungszweck).strip()
 
-                result = session.query(Expense).filter(Expense.party == e['party']).filter(Expense.text == e['text']).scalar()
+                result = session.query(Expense).filter(Expense.party == e['party']).filter(Expense.text == e['text']).filter(Expense.date == e['date']).scalar()
 
                 if result is None:
                     new_expense = Expense(**e)
@@ -208,6 +208,17 @@ def main():
             expenses = session.query(Expense).filter(Expense.amount < 0)
             sums = {}
             sums_date = {}
+
+            dates = []
+
+            for expense in expenses:
+                year = expense.date.year
+                month = expense.date.month
+                date = '{:04d}-{:02d}-01'.format(year, month)
+
+                if not date in dates:
+                    dates.append(date)
+
             for expense in expenses:
                 year = expense.date.year
                 month = expense.date.month
@@ -221,8 +232,9 @@ def main():
 
                 if not category in sums:
                     sums[category] = {}
-                if not date in sums[category]:
-                    sums[category][date] = 0.0
+
+                    for date in dates:
+                        sums[category][date] = 0.0
 
                 if not date in sums_date:
                     sums_date[date] = 0.0

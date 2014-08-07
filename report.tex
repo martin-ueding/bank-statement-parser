@@ -1,10 +1,9 @@
-\documentclass[11pt, ngerman, fleqn, DIV=15, headinclude]{scrartcl}
+\documentclass[11pt, ngerman, fleqn, DIV=15, landscape]{scrartcl}
 
 \usepackage[bibatend]{header}
 
 \usepackage{pgfplots}
 \pgfplotsset{
-    width=\linewidth,
     compat=1.9,
 }
 \usepgfplotslibrary{dateplot}
@@ -12,6 +11,8 @@
 \hypersetup{
     pdftitle=
 }
+
+\pagestyle{plain}
 
 %\subject{}
 \title{}
@@ -22,8 +23,6 @@
 
 \begin{document}
 
-\maketitle
-
 %\newpage
 %\tableofcontents
 %\newpage
@@ -32,30 +31,46 @@
     \begin{axis}[
             date coordinates in=x,
             stack plots=y,
+            xtick=data,
+            grid=major,
             xticklabel style={
                 rotate=45,
                 anchor=near xticklabel,
             },
+            width=\textwidth,
+            height=0.95\textheight,
+            legend entries={
+                Miete,
+                Zusatzkosten,
+                Internet,
+                Baumarkt,
+                Drogerie,
+                Elektronik,
+                Essen,
+                GEZ,
+                Möbel,
+                Sonstiges,
+                \textit{unsortiert},
+            },
+            legend pos=south east,
         ]
-        
-        \foreach \file in {
+
+        \foreach \filename in {
+            plot-Miete.csv,
+            plot-Zusatzkosten.csv,
+            plot-Internet.csv,
             plot-Baumarkt.csv,
             plot-Drogerie.csv,
             plot-Elektronik.csv,
             plot-Essen.csv,
             plot-GEZ.csv,
-            plot-Internet.csv,
-            plot-lines.pdf,
-            plot-Miete.csv,
-            plot-Möbel.csv,
-            plot-None.csv,
+            plot-Moebel.csv,
             plot-Sonstiges.csv,
-            plot-Zusatzkosten.csv,
+            plot-None.csv
         }
-        \addplot table {\file};
+        \addplot table {\filename};
     \end{axis}
 \end{tikzpicture}
-
 
 \end{document}
 
