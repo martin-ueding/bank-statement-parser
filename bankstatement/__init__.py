@@ -164,11 +164,12 @@ def main():
             sums = {}
             sums_date = {}
             for expense in expenses:
-                if expense.store is None:
-                    continue
                 year = expense.date.year
                 month = expense.date.month
-                category = expense.store.category.name
+                if expense.store is None:
+                    category = 'None'
+                else:
+                    category = expense.store.category.name
                 amount = expense.amount
 
                 date = (year - 2000) + (month-1)/12
@@ -201,6 +202,40 @@ def main():
             pl.ylabel('€')
             pl.savefig('plot-lines.pdf')
             pl.clf()
+
+    elif options.action == 'csv':
+        if options.what == 'months':
+            expenses = session.query(Expense).filter(Expense.amount < 0)
+            sums = {}
+            sums_date = {}
+            for expense in expenses:
+                year = expense.date.year
+                month = expense.date.month
+                if expense.store is None:
+                    category = 'None'
+                else:
+                    category = expense.store.category.name
+                amount = expense.amount
+
+                date = '{:04d}-{:02d}-01'.format(year, month)
+
+                if not category in sums:
+                    sums[category] = {}
+                if not date in sums[category]:
+                    sums[category][date] = 0.0
+
+                if not date in sums_date:
+                    sums_date[date] = 0.0
+
+                sums[category][date] -= amount
+                sums_date[date] -= amount
+
+            for category, data in sorted(sums.items()):
+                with open('plot-{}.csv'.format(category), 'w', newline='') as csvfile:
+                    writer = csv.writer(csvfile, delimiter=' ',
+                                        quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    for row in sorted(data.items()):
+                        writer.writerow(row)
 
     sync_all(session)
 
