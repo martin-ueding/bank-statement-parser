@@ -1,0 +1,62 @@
+\documentclass[11pt, ngerman, fleqn, DIV=15, headinclude]{scrartcl}
+
+\usepackage[bibatend]{header}
+
+\usepackage{pgfplots}
+\pgfplotsset{
+    width=\linewidth,
+    compat=1.9,
+}
+\usepgfplotslibrary{dateplot}
+
+\hypersetup{
+    pdftitle=
+}
+
+%\subject{}
+\title{}
+%\subtitle{}
+\author{
+    Martin Ueding \\ \small{\href{mailto:mu@martin-ueding.de}{mu@martin-ueding.de}}
+}
+
+\begin{document}
+
+\maketitle
+
+%\newpage
+%\tableofcontents
+%\newpage
+
+\begin{tikzpicture}
+    \begin{axis}[
+            date coordinates in=x,
+            stack plots=y,
+            xticklabel style={
+                rotate=45,
+                anchor=near xticklabel,
+            },
+        ]
+        
+        \foreach \file in {
+            plot-Baumarkt.csv,
+            plot-Drogerie.csv,
+            plot-Elektronik.csv,
+            plot-Essen.csv,
+            plot-GEZ.csv,
+            plot-Internet.csv,
+            plot-lines.pdf,
+            plot-Miete.csv,
+            plot-Möbel.csv,
+            plot-None.csv,
+            plot-Sonstiges.csv,
+            plot-Zusatzkosten.csv,
+        }
+        \addplot table {\file};
+    \end{axis}
+\end{tikzpicture}
+
+
+\end{document}
+
+% vim: spell spelllang=de tw=79
